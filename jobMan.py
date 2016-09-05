@@ -11,6 +11,8 @@ jobs = [
         'title': u'Reprocessing data',
         'description': u'job to treprocessing data for a given period', 
 	'date-time': u'2016-09-10-00:00:00',
+	'docker-image': u'image x',
+	'env-variables': u'ENV Variables',
         'status': u'scheduled'
     },
     {
@@ -18,6 +20,8 @@ jobs = [
         'title': u'Learn Python',
         'description': u'Need to find a good Python tutorial on the web', 
 	'date-time': u'2016-09-10-00:00:00',
+	'docker-image': u'image Y',
+        'env-variables': u'ENV Variables',
         'status': u'running'
     }
 ]
@@ -57,5 +61,37 @@ def get_Job(job_id):
 #JOB INSERT
 @app.route('/jobMan/v1.1/jobs/schedule', methods=['POST'])
 
+#Funtion to create a job
+def create_job():
+
+	#Parser to avoid uncomplete requests
+	if not request.json or not 'title' in request.json:
+		abort(400)
+	job = {
+		'id': jobs[-1]['id'] + 1,
+		'title': request.json['title'],
+		'date-time': request.json['date-time'],
+		'docker-image': request.json['docker-image'],
+		'env-variables': request.json['env-variables'],
+		'status': u'scheduled'
+	}
+	
+	#Add the job to job arrays
+	jobs.append(job)
+
+	#Return the job detail and the code 201 (created)
+	return jsonify({'job': job}), 201
+
+#Callback to set a job as finished
+@app.route('/jobMan/v1.1/jobs/<int:job_id>/callback', methods=['PUT'])
+
+#Function to update job status
+def update_job(job_id):
+
+        job = [job for job in jobs if job['id'] == job_id]
+	job[0]['status'] = u'finished'
+	return jsonify({'job': job[0]})
+
+		
 if __name__ == '__main__':
 	app.run(debug=True)
