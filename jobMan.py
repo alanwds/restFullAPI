@@ -9,6 +9,36 @@ from apscheduler.scheduler import Scheduler
 #Import date time module
 import datetime
 
+#Import ConfigParser module for parser configs files
+import ConfigParser
+
+#Import modules to parameters parser
+from optparse import OptionParser
+
+
+#Options - Parameters
+parser = OptionParser()
+parser.add_option("-c", "--config", action="store", type="string", dest="conf_file",
+		help="read config from FILE", metavar="FILE")
+parser.add_option("-q", "--quiet",
+                  action="store_false", dest="verbose", default=True,
+                  help="don't print status messages to stdout")
+
+(options, args) = parser.parse_args()
+
+#Read the config file
+configParser = ConfigParser.RawConfigParser()
+configFilePath = options.conf_file
+configParser.read(configFilePath)
+
+#Put the config values on the right place
+#AWS
+aws_region = configParser.get('aws', 'region') 
+aws_access_key = configParser.get('aws', 'access_key') 
+aws_secret_key = configParser.get('aws', 'secret_key')
+
+print aws_secret_key
+
 #Enable a fake debug module (just for watch script execution)
 debug = 0
 
@@ -138,7 +168,7 @@ def update_job(job_id):
 
 def createEC2(dockerImage):
 	date = datetime.datetime.now().time()
-	print('Creating EC2 function started ati', date)
+	print('Creating EC2 function started api', date)
 	print('Creating EC2 with',dockerImage)
 		
 if __name__ == '__main__':
